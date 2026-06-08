@@ -1,9 +1,13 @@
+export type UserRole = "admin" | "user";
+
 // ─── Profile ───────────────────────────────────────────────────────
 export interface Profile {
   id: string;
   full_name: string;
+  email: string;
   avatar_url: string | null;
   currency: string;
+  role: UserRole;
   created_at: string;
   updated_at: string;
 }
