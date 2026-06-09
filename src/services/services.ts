@@ -483,6 +483,42 @@ export async function getMonthlySummary(userId: string, year: number, month: num
   return { totalIncome, totalExpense, balance: totalIncome - totalExpense, incomes, expenses };
 }
 
+export async function getYearlyAnalytics(userId: string, year: number) {
+  const months = Array.from({ length: 12 }, (_, i) => {
+    const m = i + 1;
+    const start = `${year}-${String(m).padStart(2, "0")}-01`;
+    const end = `${year}-${String(m).padStart(2, "0")}-31`;
+    return { month: m, start, end };
+  });
+
+  const results = await Promise.all(
+    months.map(({ month, start, end }) =>
+      Promise.all([
+        getIncomes(userId, { startDate: start, endDate: end }),
+        getExpenses(userId, { startDate: start, endDate: end }),
+      ]).then(([incomes, expenses]) => {
+        const totalIncome = incomes.reduce((s, i) => s + Number(i.amount), 0);
+        const totalExpense = expenses.reduce((s, e) => s + Number(e.amount), 0);
+        return { month, totalIncome, totalExpense, balance: totalIncome - totalExpense, incomes, expenses };
+      })
+    )
+  );
+
+  const yearTotalIncome = results.reduce((s, r) => s + r.totalIncome, 0);
+  const yearTotalExpense = results.reduce((s, r) => s + r.totalExpense, 0);
+  const monthsWithData = results.filter((r) => r.totalIncome > 0 || r.totalExpense > 0).length;
+
+  return {
+    months: results,
+    yearTotalIncome,
+    yearTotalExpense,
+    yearBalance: yearTotalIncome - yearTotalExpense,
+    monthsWithData,
+    avgMonthlyIncome: monthsWithData > 0 ? yearTotalIncome / monthsWithData : 0,
+    avgMonthlyExpense: monthsWithData > 0 ? yearTotalExpense / monthsWithData : 0,
+  };
+}
+
 export async function getUnreadNotificationCount(userId: string): Promise<number> {
   const { count, error } = await supabase
     .from("notifications")
