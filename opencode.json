@@ -5,6 +5,10 @@
       "type": "remote",
       "url": "https://mcp.supabase.com/mcp?project_ref=clsdtgitqyyrsqepoojc",
       "enabled": true
+    },
+    "heroui-react": {
+      "type": "local",
+      "command": ["npx", "-y", "@heroui/react-mcp@latest"]
     }
   }
 }

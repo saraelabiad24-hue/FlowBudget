@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { AuthProvider } from "@/features/auth/AuthContext";
+import { HeroUIProvider } from "@heroui/react";
 
 export const metadata: Metadata = {
   title: "flowbudget",
@@ -19,7 +20,9 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       </head>
       <body>
-        <AuthProvider>{children}</AuthProvider>
+        <HeroUIProvider>
+          <AuthProvider>{children}</AuthProvider>
+        </HeroUIProvider>
       </body>
     </html>
   );
